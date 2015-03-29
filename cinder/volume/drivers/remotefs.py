@@ -639,13 +639,16 @@ class RemoteFSSnapDriver(RemoteFSDriver):
         if info.image:
             info.image = os.path.basename(info.image)
         if info.backing_file:
+            # Backslashes are replaced so that this check will work with
+            # Windows paths as well.
             backing_file_template = \
                 "(%(basedir)s/[0-9a-f]+/)?%" \
                 "(volname)s(.(tmp-snap-)?[0-9a-f-]+)?$" % {
-                    'basedir': basedir,
+                    'basedir': basedir.replace('\\', '/'),
                     'volname': volume_name
                 }
-            if not re.match(backing_file_template, info.backing_file):
+            if not re.match(backing_file_template,
+                            info.backing_file.replace('\\', '/')):
                 msg = _("File %(path)s has invalid backing file "
                         "%(bfile)s, aborting.") % {'path': path,
                                                    'bfile': info.backing_file}
